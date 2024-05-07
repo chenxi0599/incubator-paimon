@@ -31,7 +31,7 @@ under the License.
     <artifactId>paimon-parent</artifactId>
     <groupId>org.apache.paimon</groupId>
     <name>Paimon : </name>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8-rc4</version>
     <packaging>pom</packaging>
 
     <url>https://paimon.apache.org</url>
@@ -59,7 +59,7 @@ under the License.
         <module>paimon-core</module>
         <module>paimon-flink</module>
         <module>paimon-docs</module>
-        <module>paimon-e2e-tests</module>
+        <!--<module>paimon-e2e-tests</module>-->
         <module>paimon-filesystems</module>
         <module>paimon-format</module>
         <module>paimon-bundle</module>

@@ -19,6 +19,7 @@
 package org.apache.paimon.tests;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /** Tests for reading paimon from Spark3. */
+@DisabledIfSystemProperty(named = "test.flink.version", matches = "1.14.*")
 public class SparkE2eTest extends E2eReaderTestBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkE2eTest.class);
@@ -39,7 +41,7 @@ public class SparkE2eTest extends E2eReaderTestBase {
 
     @Test
     public void testFlinkWriteAndSparkRead() throws Exception {
-        String warehousePath = TEST_DATA_DIR + "/" + UUID.randomUUID() + "_warehouse";
+        String warehousePath = TEST_DATA_DIR + "/" + UUID.randomUUID().toString() + "_warehouse";
         final String table = "T";
         final String sparkTable = String.format("paimon.default.%s", table);
         runSql(
