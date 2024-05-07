@@ -52,6 +52,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.apache.flink.configuration.ClusterOptions.ENABLE_FINE_GRAINED_RESOURCE_MANAGEMENT;
 import static org.apache.paimon.CoreOptions.FULL_COMPACTION_DELTA_COMMITS;
 import static org.apache.paimon.flink.FlinkConnectorOptions.CHANGELOG_PRODUCER_FULL_COMPACTION_TRIGGER_INTERVAL;
 import static org.apache.paimon.flink.FlinkConnectorOptions.SINK_AUTO_TAG_FOR_SAVEPOINT;
@@ -187,7 +188,9 @@ public abstract class FlinkSink<T> implements Serializable {
     public DataStream<Committable> doWrite(
             DataStream<T> input, String commitUser, @Nullable Integer parallelism) {
         StreamExecutionEnvironment env = input.getExecutionEnvironment();
-        boolean isStreaming = isStreaming(input);
+        boolean isStreaming =
+                env.getConfiguration().get(ExecutionOptions.RUNTIME_MODE)
+                        == RuntimeExecutionMode.STREAMING;
 
         boolean writeOnly = table.coreOptions().writeOnly();
         SingleOutputStreamOperator<Committable> written =
@@ -217,8 +220,10 @@ public abstract class FlinkSink<T> implements Serializable {
 
     protected DataStreamSink<?> doCommit(DataStream<Committable> written, String commitUser) {
         StreamExecutionEnvironment env = written.getExecutionEnvironment();
-        ReadableConfig conf = env.getConfiguration();
+        ReadableConfig conf = StreamExecutionEnvironmentUtils.getConfiguration(env);
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();
+        boolean isStreaming =
+                conf.get(ExecutionOptions.RUNTIME_MODE) == RuntimeExecutionMode.STREAMING;
         boolean streamingCheckpointEnabled =
                 isStreaming(written) && checkpointConfig.isCheckpointingEnabled();
         if (streamingCheckpointEnabled) {

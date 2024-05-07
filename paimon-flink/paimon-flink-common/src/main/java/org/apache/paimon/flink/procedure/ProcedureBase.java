@@ -22,6 +22,7 @@ import org.apache.paimon.catalog.Catalog;
 import org.apache.paimon.catalog.Identifier;
 import org.apache.paimon.factories.Factory;
 import org.apache.paimon.flink.action.ActionBase;
+import org.apache.paimon.flink.utils.StreamExecutionEnvironmentUtils;
 import org.apache.paimon.table.Table;
 import org.apache.paimon.utils.StringUtils;
 
@@ -68,13 +69,13 @@ public abstract class ProcedureBase implements Procedure, Factory {
 
     protected String[] execute(ProcedureContext procedureContext, JobClient jobClient) {
         StreamExecutionEnvironment env = procedureContext.getExecutionEnvironment();
-        ReadableConfig conf = env.getConfiguration();
+        ReadableConfig conf = StreamExecutionEnvironmentUtils.getConfiguration(env);
         return execute(jobClient, conf.get(TABLE_DML_SYNC));
     }
 
     protected String[] execute(StreamExecutionEnvironment env, String defaultJobName)
             throws Exception {
-        ReadableConfig conf = env.getConfiguration();
+        ReadableConfig conf = StreamExecutionEnvironmentUtils.getConfiguration(env);
         String name = conf.getOptional(PipelineOptions.NAME).orElse(defaultJobName);
         return execute(env.executeAsync(name), conf.get(TABLE_DML_SYNC));
     }

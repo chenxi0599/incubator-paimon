@@ -132,7 +132,11 @@ public class FlinkCdcMultiTableSink implements Serializable {
                                         createCommitterFactory(),
                                         createCommittableStateManager()))
                         .setParallelism(input.getParallelism());
-        configureGlobalCommitter(committed, commitCpuCores, commitHeapMemory);
+        configureGlobalCommitter(
+                committed,
+                commitCpuCores,
+                commitHeapMemory,
+                StreamExecutionEnvironmentUtils.getConfiguration(env));
         return committed.addSink(new DiscardingSink<>()).name("end").setParallelism(1);
     }
 
