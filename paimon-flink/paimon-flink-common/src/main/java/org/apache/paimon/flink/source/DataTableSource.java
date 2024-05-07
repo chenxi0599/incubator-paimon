@@ -180,12 +180,18 @@ public class DataTableSource extends FlinkTableSource {
             }
             String watermarkAlignGroup = options.get(SCAN_WATERMARK_ALIGNMENT_GROUP);
             if (watermarkAlignGroup != null) {
-                watermarkStrategy =
-                        WatermarkAlignUtils.withWatermarkAlignment(
-                                watermarkStrategy,
-                                watermarkAlignGroup,
-                                options.get(SCAN_WATERMARK_ALIGNMENT_MAX_DRIFT),
-                                options.get(SCAN_WATERMARK_ALIGNMENT_UPDATE_INTERVAL));
+                try {
+                    watermarkStrategy =
+                            WatermarkAlignUtils.withWatermarkAlignment(
+                                    watermarkStrategy,
+                                    watermarkAlignGroup,
+                                    options.get(SCAN_WATERMARK_ALIGNMENT_MAX_DRIFT),
+                                    options.get(SCAN_WATERMARK_ALIGNMENT_UPDATE_INTERVAL));
+                } catch (NoSuchMethodError error) {
+                    throw new RuntimeException(
+                            "Flink 1.14 does not support watermark alignment, please check your Flink version.",
+                            error);
+                }
             }
         }
 
